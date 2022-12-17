@@ -1,0 +1,122 @@
+COND_ASSIGN := t_if ASSIGN_COND ASSIGN_LEFT t_asnStmt t_fi
+
+ASSIGN_COND := PTR_RANGE
+ASSIGN_COND := NUM_CMP
+ASSIGN_COND := NOT_EQ_NULL_CHECK
+ASSIGN_COND := EQ_NULL_CHECK
+ASSIGN_COND := EXPANDED_PTR_RANGE
+
+EXPANDED_PTR_RANGE := PTR_OP RELOP PTR_OP
+
+ASSIGN_LEFT := ASSIGN_NULL_VALUE
+ASSIGN_LEFT := ASSIGN_NUM_VALUE
+
+ASSIGN_NULL_VALUE := t_ptrVar:traceVarAssignNull[]
+ASSIGN_NULL_VALUE := t_var:traceVarAssignNullBase[] t_fieldAcc t_ptrVar:traceVarAssignNullField[]
+ASSIGN_NULL_VALUE := t_ptrVar:traceVarAssignNullBase[] t_derefFieldAcc t_ptrVar:traceVarAssignNullField[]
+
+ASSIGN_NUM_VALUE := t_num:traceVarAssignNum[]
+ASSIGN_NUM_VALUE := t_var:traceVarAssignNumBase[] t_fieldAcc t_num:traceVarAssignNumField[]
+ASSIGN_NUM_VALUE := t_ptrVar:traceVarAssignNumBase[] t_derefFieldAcc t_num:traceVarAssignNumField[]
+
+COND_EXEC := t_if COND_EXEC_INNER t_noJump t_fi
+COND_EXEC := t_if COND_EXEC_INNER t_noJump t_else t_noJump t_fi
+COND_EXEC := t_if COND_EXEC_INNER ASSIGN_LEFT t_asnStmt t_fi
+COND_EXEC := t_while COND_EXEC_INNER t_noJump t_elihw
+COND_EXEC := t_for COND_EXEC_INNER t_noJump t_rof
+COND_EXEC_INNER := COND_EXEC_CONDS
+
+COND_EXEC_COND := PTR_RANGE
+COND_EXEC_COND := NUM_CMP
+COND_EXEC_COND := NOT_EQ_NULL_CHECK
+
+COND_EXEC_CONDS := COND_EXEC_COND t_and:logic[] COND_EXEC_COND
+COND_EXEC_CONDS := COND_EXEC_COND t_and:logic[] COND_EXEC_CONDS
+
+COND_ABORT := t_if COND_ABORT_INNER COND_ABORT_BODY t_fi
+COND_ABORT_INNER := COND_ABORT_COND
+COND_ABORT_INNER := COND_ABORT_CONDS
+
+COND_ABORT_COND := PTR_RANGE
+COND_ABORT_COND := NUM_CMP
+COND_ABORT_COND := EQ_NULL_CHECK
+
+COND_ABORT_CONDS := COND_ABORT_COND t_or:logic[] COND_ABORT_COND
+COND_ABORT_CONDS := COND_ABORT_COND t_or:logic[] COND_ABORT_CONDS
+
+COND_ABORT_BODY := JUMP
+COND_ABORT_BODY := JUMP_LESS_THREE
+JUMP_LESS_THREE := t_less3:endSpot
+JUMP := t_break:endSpot
+JUMP := t_goto:endSpot
+JUMP := t_return:endSpot
+JUMP := t_continue:endSpot
+
+NOT_EQ_NULL_CHECK := NULL_CHECK_VAL t_nEq:relOp[] NULL_PTR
+NOT_EQ_NULL_CHECK := NULL_PTR t_nEq:relOp[] NULL_CHECK_VAL
+EQ_NULL_CHECK := NULL_CHECK_VAL t_eqEq:relOp[] NULL_PTR
+EQ_NULL_CHECK := NULL_PTR t_eqEq:relOp[] NULL_CHECK_VAL
+NULL_CHECK_VAL := t_ptrVar:traceVarNullCheck[]
+NULL_CHECK_VAL := t_var:traceVarNullCheckBase[] t_fieldAcc t_ptrVar:traceVarNullCheckField[]
+NULL_CHECK_VAL := t_ptrVar:traceVarNullCheckBase[] t_derefFieldAcc t_ptrVar:traceVarNullCheckField[]
+
+NUM_CMP := NUM_OP CMP NUM_OP
+NUM_CMP := NUM_OP RELOP NUM_OP
+NUM_CMP := t_null CMP NUM_OP
+NUM_CMP := t_null RELOP NUM_OP
+NUM_CMP := NUM_OP CMP t_null
+NUM_CMP := NUM_OP RELOP t_null
+NUM_OP := NUM_CMP_VAL
+NUM_OP := NUM_CMP_VAL ARITH NUM_CMP_VAL
+NUM_OP := NUM_CMP_VAL ARITH t_null
+NUM_OP := t_null ARITH NUM_CMP_VAL
+NUM_CMP_VAL := NUM_TRACELESS
+NUM_CMP_VAL := t_num:traceVarNumCmp[]
+NUM_CMP_VAL := t_var:traceVarNumCmpBase[] t_fieldAcc t_num:traceVarNumCmpField[]
+NUM_CMP_VAL := t_ptrVar:traceVarNumCmpBase[] t_derefFieldAcc t_num:traceVarNumCmpField[]
+
+
+PTR_RANGE := PTR_OP CMP PTR_OP
+PTR_OP := PTR_RANGE_VAL
+PTR_OP := PTR_RANGE_VAL ARITH NUM_TRACELESS
+PTR_OP := NUM_TRACELESS ARITH PTR_RANGE_VAL
+PTR_OP := PTR_RANGE_VAL ARITH t_num
+PTR_OP := t_num ARITH PTR_RANGE_VAL
+PTR_RANGE_VAL := t_ptrVar:traceVarPtrRange[]
+PTR_RANGE_VAL := t_var:traceVarPtrRangeBase[] t_fieldAcc t_ptrVar:traceVarPtrRangeField[]
+PTR_RANGE_VAL := t_ptrVar:traceVarPtrRangeBase[] t_derefFieldAcc t_ptrVar:traceVarPtrRangeField[]
+
+NULL_PTR := t_null
+NULL_PTR := t_cast t_null
+
+NUM_TRACELESS := t_litNum
+NUM_TRACELESS := SINGLECALLER t_ptrVar t_parenR
+NUM_TRACELESS := SINGLECALLER t_ptrVar t_brackL t_litNum t_brackR t_parenR
+NUM_TRACELESS := SINGLECALLER t_ptrVar t_brackL t_null t_brackR t_parenR
+NUM_TRACELESS := SINGLECALLER t_var t_parenR
+NUM_TRACELESS := SINGLECALLER t_num t_parenR
+NUM_TRACELESS := SINGLECALLER t_litNum t_parenR
+NUM_TRACELESS := SINGLECALLER t_null t_parenR
+NUM_TRACELESS := SINGLECALLER t_cast t_null t_parenR
+
+SINGLECALLER := FUNCSTART t_parenL
+
+FUNCSTART := t_sizeof
+FUNCSTART := t_function
+
+ARITH := t_plus:arith[]
+ARITH := t_minus:arith[]
+ARITH := t_mult:arith[]
+ARITH := t_div:arith[]
+
+CMP := t_les:cmp[]
+CMP := t_gtr:cmp[]
+CMP := t_lesEq:cmp[]
+CMP := t_gtrEq:cmp[]
+
+LOGICOP := t_or:logic[]
+LOGICOP := t_and:logic[]
+
+RELOP := t_eqEq:relOp[]
+RELOP := t_nEq:relOp[]
+

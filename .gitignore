@@ -1,0 +1,7 @@
+*.pyc
+FixReverter/phasar_plugin/CMakeFiles/
+FixReverter/phasar_plugin/build/
+FixReverter/phasar_plugin/include/
+*~
+FixReverter/clangTools/testFolder/CMakeCache.txt
+FixReverter/clangTools/testFolder/CMakeFiles/cmake.check_cache
