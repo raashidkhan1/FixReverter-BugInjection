@@ -1,0 +1,30 @@
+apt-get update && apt-get install -y make autoconf autogen texinfo flex bison
+
+git clone --recursive git://sourceware.org/git/binutils-gdb.git binutils-gdb
+cd binutils-gdb
+git checkout 7c96e6120f1b9b5025629bbe995ca55d1be8f36f
+
+./configure --disable-gdb --disable-gdbserver --disable-gdbsupport \
+	    --disable-libdecnumber --disable-readline --disable-sim \
+	    --enable-targets=all --disable-werror
+make -j$(nproc)
+
+cd binutils
+cp ../../fuzz_cxxfilt.c .
+
+# Modify main functions so we dont have them anymore
+sed 's/main (int argc/old_main (int argc, char **argv);\nint old_main (int argc/' cxxfilt.c > cxxfilt.h
+
+$CC $CFLAGS -DHAVE_CONFIG_H -I. -I../bfd -I./../bfd -I./../include -I./../zlib -DLOCALEDIR="\"/usr/local/share/locale\"" -Dbin_dummy_emulation=bin_vanilla_emulation -W -Wall -MT fuzz_cxxfilt.o -MD -MP -c -o fuzz_cxxfilt.o fuzz_cxxfilt.c
+
+# Link the files
+## cxxfilt
+$CXX $CXXFLAGS $LIB_FUZZING_ENGINE -W -Wall -Wstrict-prototypes -Wmissing-prototypes -Wshadow -I./../zlib -o fuzz_cxxfilt fuzz_cxxfilt.o bucomm.o version.o filemode.o ../bfd/.libs/libbfd.a -L/src/binutils-gdb/zlib -lpthread -ldl -lz ../libiberty/libiberty.a
+
+cp fuzz_cxxfilt $SRC/fuzzer
+
+cd $SRC
+extract-bc fuzzer
+llvm-dis fuzzer.bc
+
+sed -i 's/cxxfilt.c/cxxfilt.h/g' $SRC/apm.json

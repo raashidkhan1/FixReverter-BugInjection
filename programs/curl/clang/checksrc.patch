@@ -1,0 +1,50 @@
+diff --git a/lib/Makefile.am b/lib/Makefile.am
+index f2886ec63..e2d3eb7b4 100644
+--- a/lib/Makefile.am
++++ b/lib/Makefile.am
+@@ -137,14 +137,14 @@ CS_0 = @echo "  RUN     " $@;
+ CS_1 =
+ CS_ = $(CS_0)
+ 
+-checksrc:
+-	$(CHECKSRC)(@PERL@ $(srcdir)/checksrc.pl -D$(srcdir) -W$(srcdir)/curl_config.h \
+-	$(srcdir)/*.[ch] $(srcdir)/vauth/*.[ch] $(srcdir)/vtls/*.[ch] $(srcdir)/vquic/*.[ch] $(srcdir)/vssh/*.[ch])
++#checksrc:
++#	$(CHECKSRC)(@PERL@ $(srcdir)/checksrc.pl -D$(srcdir) -W$(srcdir)/curl_config.h \
++#	$(srcdir)/*.[ch] $(srcdir)/vauth/*.[ch] $(srcdir)/vtls/*.[ch] $(srcdir)/vquic/*.[ch] $(srcdir)/vssh/*.[ch])
+ 
+-if CURLDEBUG
++#if CURLDEBUG
+ # for debug builds, we scan the sources on all regular make invokes
+-all-local: checksrc
+-endif
++#all-local: checksrc
++#endif
+ 
+ # disable the tests that are mostly causing false positives
+ TIDYFLAGS=-checks=-clang-analyzer-security.insecureAPI.strcpy,-clang-analyzer-optin.performance.Padding,-clang-analyzer-valist.Uninitialized,-clang-analyzer-core.NonNullParamChecker,-clang-analyzer-core.NullDereference -quiet
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 90f156248..617c96b23 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -137,14 +137,14 @@ endif
+ 
+ # ignore tool_hugehelp.c since it is generated source code and it plays
+ # by slightly different rules!
+-checksrc:
+-	$(CHECKSRC)(@PERL@ $(top_srcdir)/lib/checksrc.pl -D$(srcdir)        \
+-	-W$(srcdir)/tool_hugehelp.c $(srcdir)/*.[ch])
++#checksrc:
++#	$(CHECKSRC)(@PERL@ $(top_srcdir)/lib/checksrc.pl -D$(srcdir)        \
++#	-W$(srcdir)/tool_hugehelp.c $(srcdir)/*.[ch])
+ 
+-if CURLDEBUG
++#if CURLDEBUG
+ # for debug builds, we scan the sources on all regular make invokes
+-all-local: checksrc
+-endif
++#all-local: checksrc
++#endif
+ 
+ # disable the tests that are mostly causing false positives
+ TIDYFLAGS=-checks=-clang-analyzer-security.insecureAPI.strcpy,-clang-analyzer-optin.performance.Padding,-clang-analyzer-valist.Uninitialized,-clang-analyzer-core.NonNullParamChecker,-clang-analyzer-core.NullDereference
