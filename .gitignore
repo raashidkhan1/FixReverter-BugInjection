@@ -5,3 +5,6 @@ FixReverter/phasar_plugin/include/
 *~
 FixReverter/clangTools/testFolder/CMakeCache.txt
 FixReverter/clangTools/testFolder/CMakeFiles/cmake.check_cache
+.vscode/settings.json
+experiment-data/*
+report-data/*

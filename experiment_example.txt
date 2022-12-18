@@ -1,0 +1,7 @@
+
+PYTHONPATH=. python3 experiment/run_experiment.py \
+--experiment-config experiment-config.yaml \
+--benchmarks lcms \
+--experiment-name exp \
+--fuzzers afl \
+-a
